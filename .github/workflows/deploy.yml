@@ -1,0 +1,50 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  # Every push to main — which is what saving in the CMS produces.
+  push:
+    branches: [main]
+  # Manual re-run from the Actions tab.
+  workflow_dispatch:
+
+# Least privilege: this workflow only needs to read the repo. Deploy auth comes
+# from the CLOUDFLARE_API_TOKEN secret below, not from a GitHub OIDC token.
+permissions:
+  contents: read
+
+# Let an in-flight deploy finish rather than cancelling it mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm run build` triggers the `postbuild` script — that is where Pagefind
+      # indexes dist/ and writes dist/pagefind/, so the search index is part of
+      # what gets uploaded below.
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
+      # Uploads dist/ straight to the Cloudflare Pages project named below via
+      # Wrangler. The project must already exist (docs/setup.md) and
+      # CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID must be set as repository
+      # secrets — Settings → Secrets and variables → Actions.
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=cloudflare-blog --branch=main
