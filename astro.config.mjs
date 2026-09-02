@@ -2,12 +2,14 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// Cloudflare Pages project, served from its *.pages.dev domain root, so there is no
-// base path. `base` is left at its default of '/'. src/lib/url.ts still mediates every
-// internal link, so the site can move under a sub-path (or onto a custom domain) by
-// changing `site`/`base` here and nothing else.
+// Deployed via Cloudflare's dashboard Git integration, which assigned this project the
+// account-subdomain URL below rather than a *.pages.dev one — served from its domain
+// root either way, so there is no base path. `base` is left at its default of '/'.
+// src/lib/url.ts still mediates every internal link, so the site can move under a
+// sub-path (or onto a custom domain, see docs/setup.md) by changing `site`/`base` here
+// and nothing else.
 export default defineConfig({
-  site: 'https://cloudflare-blog.pages.dev',
+  site: 'https://cloudflare-blog.aumnidigital-work.workers.dev',
   trailingSlash: 'always',
   integrations: [
     sitemap({
