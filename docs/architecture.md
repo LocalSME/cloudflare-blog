@@ -15,7 +15,7 @@ How the site is put together, and why the awkward parts are the way they are.
 | Feed | `@astrojs/rss` | 4.x |
 | Sitemap | `@astrojs/sitemap` | 3.x |
 | Styling | Hand-written CSS with custom properties | — |
-| Hosting | Cloudflare Pages, deployed by GitHub Actions running Wrangler | — |
+| Hosting | Cloudflare (Workers/Pages), deployed by Cloudflare's dashboard Git integration | — |
 
 Three runtime dependencies, three dev dependencies. No CSS framework — the whole
 stylesheet is one file of about 800 lines and nothing is shipped that isn't used.
@@ -63,8 +63,8 @@ IDs, the contact endpoint and social links.
 dynamic routes ahead of rest parameters, and in a static build every path is enumerated
 up front, so the two cannot silently collide.
 
-Post URLs read `https://cloudflare-blog.pages.dev/blog/<slug>/` — the site root plus
-the collection's route. Cloudflare Pages projects don't have GitHub's
+Post URLs read `https://cloudflare-blog.aumnidigital-work.workers.dev/blog/<slug>/` —
+the site root plus the collection's route. Cloudflare Pages projects don't have GitHub's
 user-site-vs-project-site split at all, so there's no `/blog/blog/<slug>/`-style
 doubling risk to design around here — this project is root-served the same way the
 sibling GitHub Pages user site is, just for a different reason.
@@ -129,7 +129,7 @@ To re-check after any change, build and confirm this prints nothing:
 
 ```bash
 npm run build
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'cloudflare-blog.pages.dev' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'cloudflare-blog.aumnidigital-work.workers.dev' | sort -u
 ```
 
 That's the full audit — every internal link, `srcset` entry and in-page anchor resolved
@@ -205,9 +205,9 @@ Astro integration:
 "postbuild": "pagefind --site dist"
 ```
 
-Using the npm lifecycle hook matters: `withastro/action` runs `npm run build`, so the
-index is produced inside CI and ships in the deployed artifact without the workflow
-needing a separate step.
+Using the npm lifecycle hook matters: Cloudflare's build runs `npm run build`, so the
+index is produced during that build and ships in the deployed artifact without any
+separate build step to configure.
 
 Only elements marked `data-pagefind-body` are indexed — the post `<article>` and the
 About page — so navigation chrome does not pollute results.

@@ -6,12 +6,14 @@ in one place: **repository write access**.
 
 ## Threat model in one paragraph
 
-The published site is static HTML on Cloudflare Pages. Nothing is computed per request
-and no visitor input is stored. There are two independent ways to change what visitors
-see: a commit to this GitHub repository (which triggers a rebuild and redeploy), or a
-direct deploy to the Cloudflare Pages project using its API token. So the security of
-the blog is the security of *both* — the GitHub account/tokens that can write to the
-repo, and the Cloudflare API token that can push to the Pages project.
+The published site is static HTML on Cloudflare. Nothing is computed per request and no
+visitor input is stored. There are two independent ways to change what visitors see: a
+commit to this GitHub repository (which Cloudflare's dashboard Git integration picks up
+and rebuilds automatically), or a change made directly in the Cloudflare dashboard —
+build settings, environment variables, custom domains, or rolling back to an older
+deployment — none of which touches git at all. So the security of the blog is the
+security of *both* — the GitHub account/tokens that can write to the repo, and whoever
+has access to the Cloudflare account/dashboard that builds and serves it.
 
 ## The CMS token
 
@@ -34,8 +36,9 @@ Either way the token:
 
 - does **not** need Pull requests access (`publish_mode: simple` commits to `main`);
 - should have an expiry set;
-- **carries write access to the whole repository, not just posts** — including the
-  GitHub Actions workflow file, which runs on every push.
+- **carries write access to the whole repository, not just posts** — and every push to
+  `main` is picked up and built by Cloudflare automatically, with no CI gate or review
+  step in between.
 
 Treat it like a password. Do not commit it, do not paste it into anything other than the
 Sveltia sign-in prompt, and revoke it at
@@ -44,30 +47,33 @@ Sveltia sign-in prompt, and revoke it at
 The token is held in browser storage on the machine where you signed in. Signing out
 from the CMS clears it. Revoking it on GitHub invalidates it everywhere.
 
-## The Cloudflare deploy token
+## The Cloudflare side
 
-`.github/workflows/deploy.yml` authenticates to Cloudflare with `CLOUDFLARE_API_TOKEN`
-and `CLOUDFLARE_ACCOUNT_ID`, stored as encrypted GitHub Actions secrets — never in this
-repository. Whoever holds a copy of that token can deploy arbitrary content to the
-`cloudflare-blog` Pages project **without touching git at all**, bypassing the commit
-history, branch protection and code review entirely.
+There is no deploy token in this project — no `CLOUDFLARE_API_TOKEN`, no GitHub Actions
+secret, no Wrangler CLI anywhere in the pipeline. Deploys happen because Cloudflare's
+dashboard is connected directly to this GitHub repository through its own **GitHub App
+installation**, granted read access when that connection was made in the dashboard
+(**Workers & Pages → the connected project**). That installation is what lets Cloudflare
+see pushes to `main` and pull the code to build.
 
-Scope it as tightly as Cloudflare allows — a **Custom Token** with `Cloudflare Pages:
-Edit` for this account only, not the broad "Edit Cloudflare Workers" template, which
-also grants Workers/KV/R2 access this project does not need. Rotate it from the
-Cloudflare dashboard (**My Profile → API Tokens**) the moment you suspect exposure; a
-compromised deploy token is fixed by revoking it there, not by anything in this repo.
+That gives two independent things to think about, separate from the CMS token above:
 
-Because GitHub Actions secrets are opaque even to repository admins after creation
-(only overwrite, never read back), losing track of who has access reduces to "who has
-admin on this GitHub repo" — the same access-control question as the CMS token, just
-for a different capability.
+- **The GitHub App installation itself.** Anyone who can manage installed GitHub Apps on
+  the `CreativeDigitalGrowth` account can revoke or reconfigure what repositories
+  Cloudflare's integration can see. That is a GitHub-side permission, not a Cloudflare
+  one.
+- **Cloudflare account/dashboard access.** Separately, anyone who can log into the
+  Cloudflare account can change build settings, environment variables, custom domains,
+  or roll back to an older deployment — **without touching GitHub at all**, bypassing
+  commit history, branch protection and code review entirely. There is no scoped token
+  to rotate here; the control is simply who has login access to the Cloudflare account,
+  and that access should be kept as tight as the GitHub collaborator list below.
 
 ## No permission model
 
 There are no CMS roles. Anyone who can push to this repository can publish, edit or
-delete any post, and can also modify the deploy workflow. Access control is GitHub's
-collaborator list and nothing else. Keep that list short.
+delete any post, and whatever they push is built and served automatically. Access
+control is GitHub's collaborator list and nothing else. Keep that list short.
 
 ## Deletion is not erasure
 
@@ -119,8 +125,8 @@ pinned alternative if you would rather trade one risk for the other.
 ## Reporting a vulnerability
 
 If you find a security problem, please **do not open a public issue**. Email the address
-on the [contact page](https://cloudflare-blog.pages.dev/contact/) with enough detail to
-reproduce it, and allow a reasonable window before disclosure.
+on the [contact page](https://cloudflare-blog.aumnidigital-work.workers.dev/contact/)
+with enough detail to reproduce it, and allow a reasonable window before disclosure.
 
 This is a personal blog maintained by one person, not a funded project — there is no
 bounty and response times are best-effort. Reports are still very welcome.

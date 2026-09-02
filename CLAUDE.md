@@ -1,7 +1,7 @@
 # Working in this repository
 
-A solo-author static blog: Astro 7 + TypeScript, deployed to **Cloudflare Pages** via a
-GitHub Actions workflow that runs Wrangler, served from the domain root. Independent
+A solo-author static blog: Astro 7 + TypeScript, deployed to **Cloudflare** by its
+dashboard's own Git integration, served from the domain root. Independent
 from the sibling GitHub Pages blog (`CreativeDigitalGrowth/CreativeDigitalGrowth.github.io`)
 and the sibling GitLab Pages blog (`creativedigitalgrowth.gitlab.io`) — not a mirror, no
 shared content, no shared git history. Full detail in
@@ -22,7 +22,6 @@ npm run dev      # localhost:4321/ — drafts visible
 npm run build    # production build + Pagefind index
 npm run preview  # serves dist/ — the only faithful test of search and base paths
 npm run check    # TypeScript + Astro diagnostics; keep this at 0 errors
-npm run deploy   # local one-off: wrangler pages deploy dist — CI does this on push
 ```
 
 **On this Windows machine**, Smart App Control blocks Astro's native compiler binary.
@@ -70,19 +69,20 @@ breaks the build.
 **`public/admin/config.yml` is YAML.** Quote any string containing `: ` — an unquoted
 colon-space silently breaks the whole CMS.
 
-**The content repo (GitHub) and the host (Cloudflare Pages) are two separate systems.**
-Sveltia CMS commits to the GitHub repo named in `public/admin/config.yml`; Cloudflare
-never sees a commit directly. The GitHub Actions workflow is what bridges the two — it
-builds on every push to `main` and uploads `dist/` to the Cloudflare Pages project via
-Wrangler. If a post is missing from the live site, check the Actions run before
-suspecting Cloudflare.
+**The content repo (GitHub) and the host (Cloudflare) are two separate systems, bridged
+by Cloudflare's own Git integration.** Sveltia CMS commits to the GitHub repo named in
+`public/admin/config.yml`. Cloudflare's dashboard is connected directly to that repo via
+its own GitHub App installation — it watches for pushes to `main` and builds and deploys
+itself, server-side. There is no GitHub Actions workflow and no Wrangler step in this
+project's pipeline. If a post is missing from the live site, check the Deployments tab
+in the Cloudflare dashboard (build log and status) before suspecting anything else.
 
 ## Before calling a change done
 
 ```bash
 npm run check    # expect 0 errors
 npm run build
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'cloudflare-blog.pages.dev' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'cloudflare-blog.aumnidigital-work.workers.dev' | sort -u
 ```
 
 The grep must print only genuinely external URLs (giscus, google maps, unpkg). If the
@@ -91,29 +91,27 @@ change is visible in a browser, verify with `npm run preview` rather than `npm r
 
 ## Deployment
 
-Push to `main` → `.github/workflows/deploy.yml` builds with `npm run build` (which
-triggers the `postbuild` Pagefind index) and deploys `dist/` with
-`wrangler pages deploy` under `cloudflare/wrangler-action@v3`. Saving in the CMS is a
-push, so publishing and deploying are the same action. See
+Push to `main` → Cloudflare's dashboard Git integration (Workers & Pages → this project,
+connected directly to `CreativeDigitalGrowth/cloudflare-blog`) picks it up via its own
+GitHub App installation and builds and deploys it itself — `npm run build` (which
+triggers the `postbuild` Pagefind index), then publishing the output directory. Saving in
+the CMS is a push, so publishing and deploying are the same action. There is no GitHub
+Actions workflow and no Wrangler CLI involved anywhere in this pipeline. See
 [`docs/deployment.md`](docs/deployment.md).
 
-That workflow needs two repository secrets that do not exist until someone sets them —
-**Settings → Secrets and variables → Actions**:
+No repository secrets exist or are needed — build authorization is entirely between
+Cloudflare and its own GitHub App installation, not a token stored in this repo.
 
-- `CLOUDFLARE_API_TOKEN` — scoped to `Cloudflare Pages: Edit` for the account
-- `CLOUDFLARE_ACCOUNT_ID`
-
-And the Cloudflare Pages project itself (`cloudflare-blog`) must exist before the first
-deploy — `wrangler pages project create cloudflare-blog --production-branch=main`, or
-create it once from the Cloudflare dashboard. See [`docs/setup.md`](docs/setup.md).
-
-There is no GitHub-Pages-style "build source" setting and no Jekyll-alongside-the-build
-problem here — that is a GitHub Pages legacy quirk that does not exist on Cloudflare
-Pages. Every deploy is exactly what this workflow uploads.
+**Build settings — build command, output directory, Node version, environment
+variables — live in the Cloudflare dashboard project settings, not in any file in this
+repository.** There is no `wrangler.toml` and none is needed. This is the one real
+"where do I configure X" gotcha coming from the sibling GitHub Pages blog, whose
+equivalent settings live in a workflow file you can read in this repo — here, look in
+the dashboard instead. See [`docs/setup.md`](docs/setup.md).
 
 Local git authenticates as `mohiseen-aumni`, the same account used for the sibling
-GitHub Pages blog. **This repository does not exist on GitHub yet** — it has not been
-created or pushed. Do not assume it is live until that has actually happened.
+GitHub Pages blog. The repository exists on GitHub, is public, and is live at
+`CreativeDigitalGrowth/cloudflare-blog`.
 
 ## Documentation
 
@@ -125,4 +123,4 @@ Full docs: https://docs.astro.build
 - [Astro components](https://docs.astro.build/en/basics/astro-components/)
 
 Cloudflare-specific: https://developers.cloudflare.com/pages/ and
-https://developers.cloudflare.com/workers/wrangler/
+https://developers.cloudflare.com/pages/configuration/git-integration/

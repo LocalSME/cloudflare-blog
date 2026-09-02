@@ -2,9 +2,10 @@
 #
 # Auth: GitHub backend with fine-grained Personal Access Token login.
 #
-# The content repo is GitHub even though hosting is Cloudflare Pages — Sveltia needs a
-# real git host to commit to, and Cloudflare Pages builds from that same repo via
-# Wrangler in CI (see .github/workflows/deploy.yml). The two are independent choices.
+# The content repo is GitHub even though hosting is Cloudflare — Sveltia needs a real
+# git host to commit to, and Cloudflare's dashboard is connected directly to that same
+# repo via its own Git integration, building and deploying on every push. The two are
+# independent choices.
 #
 # Use the "Sign In Using Access Token" button. The "Sign In with GitHub" button starts
 # an OAuth flow that requires a server to hold a client secret; there is no `base_url`

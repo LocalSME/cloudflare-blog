@@ -1,20 +1,15 @@
 # One-time setup
 
-Everything on this page is done once. Section 1 is not optional the way the rest are:
-without the Cloudflare Pages project and its two deploy secrets, the deploy step in
-`.github/workflows/deploy.yml` fails outright on every push. Sections 2 onward degrade
-gracefully — missing pieces mean a notice or a fallback, not a broken build.
+Everything on this page is done once. Sections degrade gracefully — missing pieces mean
+a notice or a fallback, not a broken build.
 
-Nothing below has been done yet. The GitHub repository
-(`CreativeDigitalGrowth/cloudflare-blog`) has not been created or pushed, and the
-Cloudflare Pages project does not exist.
+The GitHub repository (`CreativeDigitalGrowth/cloudflare-blog`) is created, public and
+pushed. Cloudflare's dashboard is connected to it and deploying automatically.
 
 | Step | Status |
 | --- | --- |
-| Repository created and pushed | ❌ not done |
-| Cloudflare Pages project created | ❌ not done |
-| Deploy secrets set (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`) | ❌ not set |
-| GitHub Actions workflow deploying | ❌ blocked on the above |
+| Repository created and pushed | ✅ done |
+| Cloudflare Git integration connected | ✅ done |
 | Fine-grained PAT for the CMS | ❌ not created |
 | Giscus comments | ❌ not configured |
 | Contact form endpoint | ❌ not set |
@@ -22,53 +17,28 @@ Cloudflare Pages project does not exist.
 
 ---
 
-## 1. Cloudflare Pages project and deploy secrets
+## 1. Cloudflare Git integration ✅
 
-Two things have to exist before a push to `main` can deploy anything. The workflow
-builds regardless of either — `npm ci && npm run build` needs neither — but its final
-step, `wrangler pages deploy dist --project-name=cloudflare-blog --branch=main`, fails
-without both.
+Done. This is a manual, one-time action taken directly in the Cloudflare dashboard — not
+something a future reader needs to redo — recorded here so it's clear what exists and
+where to find it.
 
-### The Cloudflare Pages project
+Cloudflare's dashboard is connected directly to `CreativeDigitalGrowth/cloudflare-blog`:
+**Workers & Pages → Create → Connect to Git → `CreativeDigitalGrowth/cloudflare-blog`**.
+That connection installs a Cloudflare-owned GitHub App with read access to this repo, and
+from then on Cloudflare watches `main` itself and rebuilds on every push — no GitHub
+Actions workflow, no Wrangler CLI, no repository secrets involved anywhere.
 
-Create it once, before the first deploy:
+Build command, output directory, Node version and environment variables are all set in
+the Cloudflare dashboard, on this connected project's **Settings** page — not in any
+file in this repo. See [deployment.md](deployment.md#whats-configurable-and-where) for
+the current values.
 
-```bash
-wrangler pages project create cloudflare-blog --production-branch=main
-```
-
-Needs `wrangler login`, or `CLOUDFLARE_API_TOKEN` set in the shell you run it from.
-Alternatively, create it once via the dashboard: **Workers & Pages → Create → Pages →
-Direct Upload**.
-
-The project name must be exactly `cloudflare-blog` — it has to match what the workflow
-passes to `--project-name`. A typo or mismatch fails the deploy step; see
-[troubleshooting.md](troubleshooting.md#deploy-fails-with-project-not-found).
-
-This project is Wrangler-driven only. There is no Cloudflare dashboard "Git
-integration" connecting the Pages project directly to GitHub — Cloudflare never talks
-to GitHub. GitHub Actions is what builds and uploads, via the two secrets below.
-
-### The two deploy secrets
-
-**Settings → Secrets and variables → Actions**, on the
-`CreativeDigitalGrowth/cloudflare-blog` repository:
-
-| Secret | Where to get it |
-| --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → **My Profile → API Tokens → Create Token → Custom Token**, scoped to `Account.Cloudflare Pages: Edit` for this account only. Do not use the "Edit Cloudflare Workers" template — it also grants Workers, KV and R2 access this project has no use for. |
-| `CLOUDFLARE_ACCOUNT_ID` | Visible in the Cloudflare dashboard sidebar on any domain/account overview page, or via `wrangler whoami` |
-
-Once both secrets exist and the project has been created, a push to `main` (or a
-manual `workflow_dispatch` run from the Actions tab) deploys. Verify with
-`wrangler pages deployment list --project-name=cloudflare-blog` or the dashboard's
-Deployments tab — see [deployment.md](deployment.md#verifying-a-deployment).
-
-For local one-off deploys without going through Actions: `npm run deploy`
-(`wrangler pages deploy dist --project-name=cloudflare-blog`), which needs the same
-Cloudflare auth locally. Note it has no `--branch=main` flag, unlike the CI workflow —
-run from a branch other than the Pages project's production branch and Wrangler creates
-a preview deployment instead of touching production.
+The live URL is <https://cloudflare-blog.aumnidigital-work.workers.dev> — a
+Workers-platform account-subdomain URL rather than the classic `<project>.pages.dev`
+pattern, because that's what this newer Git-integration flow assigns. A custom domain
+can be attached later from the same dashboard project; see
+[§7 below](#7-optional-custom-domain).
 
 ## 2. Access token for the CMS
 
@@ -116,8 +86,8 @@ strictly tighter. Prefer fine-grained when the owner account is available to you
 
 Whichever you use, commits are authored by the account that issued the token.
 
-Then open <https://cloudflare-blog.pages.dev/admin/>, choose **"Sign In Using Access
-Token"** and paste it.
+Then open <https://cloudflare-blog.aumnidigital-work.workers.dev/admin/>, choose
+**"Sign In Using Access Token"** and paste it.
 
 > There is no "Sign In with GitHub" button on the login screen. It starts an OAuth flow
 > that needs a server to hold a client secret, which a static site cannot have, so it
@@ -203,10 +173,10 @@ Blogs commonly split the two: a permissive code licence (MIT) plus a content lic
 
 A custom domain needs `site` in `astro.config.mjs`, `site_url`/`display_url` in
 `public/admin/config.yml`, and the `Sitemap:` line in `public/robots.txt` all updated to
-the new domain, plus adding the domain on the Cloudflare side: **Pages project
-(`cloudflare-blog`) → Custom domains → Set up a custom domain**. If the domain's
+the new domain, plus adding the domain on the Cloudflare side: **Workers & Pages → the
+connected project → Custom domains → Set up a custom domain**. If the domain's
 nameservers are already on Cloudflare, Cloudflare provisions the certificate and DNS
 automatically; otherwise it walks through the CNAME record to add at your registrar.
 
-Because this is already a root-served Cloudflare Pages project, no base path has to
-change. See [architecture.md](architecture.md#base-paths).
+Because this is already a root-served project, no base path has to change. See
+[architecture.md](architecture.md#base-paths).

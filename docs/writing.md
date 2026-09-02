@@ -5,8 +5,8 @@ identical results — the CMS is just an editor for the same files.
 
 ## The CMS
 
-Open <https://cloudflare-blog.pages.dev/admin/> and choose **"Sign In Using Access
-Token"** (see [setup.md](setup.md#2-access-token-for-the-cms)).
+Open <https://cloudflare-blog.aumnidigital-work.workers.dev/admin/> and choose **"Sign
+In Using Access Token"** (see [setup.md](setup.md#2-access-token-for-the-cms)).
 
 **New Post → fill the fields → uncheck Draft → Save.**
 

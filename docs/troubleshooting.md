@@ -1,7 +1,10 @@
 # Troubleshooting
 
-Every entry here is a failure that actually happened while building or deploying this
-site, with the fix that worked.
+Most entries here are a failure that actually happened while building or deploying this
+site, with the fix that worked. The two Cloudflare pipeline entries are written for the
+current deploy mechanism (Cloudflare's dashboard Git integration) rather than a specific
+incident — that pipeline hasn't hit a real failure yet — and describe where to look
+based on how it's documented to work.
 
 ---
 
@@ -139,59 +142,53 @@ you need it absolute, never `withBase()`.
 
 ---
 
-## Deploy fails with a Wrangler authentication error
+## Cloudflare doesn't pick up a push
 
-```
-✗ Deploy to Cloudflare Pages
-  Error: A request to the Cloudflare API failed.
-  Authentication error [code: 10000]
-```
+A commit lands on `main` (including a CMS save) but the live site does not change after
+a few minutes.
 
-**Cause.** `CLOUDFLARE_API_TOKEN` is missing, expired, or scoped to the wrong Cloudflare
-account. A common variant: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` pasted into
-each other's secret slot.
+**Cause.** Almost always one of three things: the dashboard's Git integration has been
+disconnected or reconfigured, the GitHub App installation Cloudflare uses to read this
+repo has lost access, or the build actually ran and failed — which looks identical to
+"nothing happened" if you only check the live site.
 
-**Fix.** **Settings → Secrets and variables → Actions** on
-`CreativeDigitalGrowth/cloudflare-blog` — confirm both secrets exist, are spelled
-exactly `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (GitHub Actions secret names
-are case-sensitive, and a typo fails as "not found" rather than a clear error), and hold
-the right kind of value in the right slot. If the token itself is suspect, issue a new
-one: Cloudflare dashboard → My Profile → API Tokens → Create Token → Custom Token,
-scoped to `Account.Cloudflare Pages: Edit` for the account that owns the
-`cloudflare-blog` project. See
-[setup.md](setup.md#1-cloudflare-pages-project-and-deploy-secrets).
+**Fix.** Check the Cloudflare dashboard first — **Workers & Pages → the connected
+project → Deployments** — for a build that ran and failed, with the actual error in its
+log. If no new deployment shows up at all for the commit:
 
-Confirm a token works before trusting it in CI:
+- Confirm the project is still connected: **Settings → Build → Git repository** should
+  still show `CreativeDigitalGrowth/cloudflare-blog`.
+- Check the GitHub App installation itself — <https://github.com/settings/installations>
+  (or the organization equivalent under `CreativeDigitalGrowth`) — and confirm Cloudflare
+  Workers & Pages is still installed with access to this repository, and check its
+  **Advanced** tab for recent webhook deliveries and their response codes.
+- Confirm the push actually reached GitHub: `git log --oneline origin/main` should show
+  the commit.
 
-```bash
-CLOUDFLARE_API_TOKEN=... CLOUDFLARE_ACCOUNT_ID=... wrangler pages deployment list --project-name=cloudflare-blog
-```
+There is no Actions run or workflow log to check instead — the Cloudflare dashboard's
+build log is the only record of what happened.
 
 ---
 
-## Deploy fails with "Project not found"
+## Cloudflare build fails
 
-```
-✗ Deploy to Cloudflare Pages
-  Error: Project not found. The specified project name does not match any of your
-  existing projects.
-```
+**Cause.** Same range of causes as any failed `npm run build` — a schema error, a broken
+dependency, a Node version mismatch — but surfaced in the Cloudflare dashboard rather
+than a local terminal.
 
-**Cause.** Either `wrangler pages project create` was never run for this project, or it
-was created under a different name than what the workflow deploys to. The name has to
-match exactly in three places: `--project-name=cloudflare-blog` in
-`.github/workflows/deploy.yml`, the same flag in `package.json`'s `deploy` script, and
-the project's actual name in the Cloudflare dashboard.
-
-**Fix.** Create the project if it does not exist yet:
+**Fix.** **Workers & Pages → the connected project → Deployments → the failed
+deployment** shows the full build log. Reproduce locally to iterate faster:
 
 ```bash
-wrangler pages project create cloudflare-blog --production-branch=main
+npm ci
+npm run build
 ```
 
-If it already exists under a different name, either rename it in the dashboard
-(**Workers & Pages**) or update `--project-name` in both places above to match. See
-[setup.md](setup.md#1-cloudflare-pages-project-and-deploy-secrets).
+If it fails locally too, the log tells you exactly what to fix — see the schema and
+image-related entries below for the common cases. If it succeeds locally but fails on
+Cloudflare, compare **Settings → Build** (build command, output directory, Node version)
+against what actually runs locally; a Node version mismatch is the usual culprit. See
+[setup.md](setup.md#1-cloudflare-git-integration).
 
 ---
 
@@ -238,8 +235,9 @@ neither.
 
 ## CMS "View on Live Site" link 404s
 
-The link points at `https://cloudflare-blog.pages.dev/<slug>/` — one `blog/` short of
-the real URL, `https://cloudflare-blog.pages.dev/blog/<slug>/`.
+The link points at `https://cloudflare-blog.aumnidigital-work.workers.dev/<slug>/` —
+one `blog/` short of the real URL,
+`https://cloudflare-blog.aumnidigital-work.workers.dev/blog/<slug>/`.
 
 **Cause.** Sveltia keeps only the **origin** of `site_url` when building preview links.
 From the bundle:
@@ -309,7 +307,7 @@ To settle it definitively, compare a clean build against the live sitemap:
 ```bash
 rm -rf dist .astro && npm run build
 find dist -name index.html | sed 's#^dist##; s#/index.html#/#' | sort > /tmp/local.txt
-curl -s https://cloudflare-blog.pages.dev/sitemap-0.xml   | grep -oE '<loc>[^<]*</loc>' | sed -E 's#</?loc>##g; s#https://cloudflare-blog.pages.dev##'   | sort > /tmp/live.txt
+curl -s https://cloudflare-blog.aumnidigital-work.workers.dev/sitemap-0.xml   | grep -oE '<loc>[^<]*</loc>' | sed -E 's#</?loc>##g; s#https://cloudflare-blog.aumnidigital-work.workers.dev##'   | sort > /tmp/live.txt
 diff /tmp/local.txt /tmp/live.txt
 ```
 
@@ -333,9 +331,9 @@ curl -s -o /dev/null -w '%{http_code}
 ' --max-time 20 https://picsum.photos/id/727/1920/1280.webp
 ```
 
-A `522` or a timeout confirms it. This is environment-specific — GitHub Actions may
-reach a host your machine cannot, which is exactly why a local build can differ from a
-successful deploy.
+A `522` or a timeout confirms it. This is environment-specific — Cloudflare's build
+environment may reach a host your machine cannot, which is exactly why a local build can
+differ from a successful deploy.
 
 **This is a warning, not an error.** `src/lib/remote-image.ts` catches the failure and
 falls back to loading the image from its original host, unoptimised. The build still
@@ -413,11 +411,9 @@ If it says `draft: true`, untick **Draft** in the CMS and save again.
 **2. The build failed, so nothing deployed.** A failed build leaves the previous
 version live — which looks identical to "my post did not appear".
 
-```bash
-gh run list --repo CreativeDigitalGrowth/cloudflare-blog --limit 5
-```
-
-A `failure` row is the answer. See the next entry for the most common cause.
+Check **Workers & Pages → the connected project → Deployments** in the Cloudflare
+dashboard. A failed deployment there is the answer, and its log shows why — see the
+next entry for the most common cause.
 
 ---
 
