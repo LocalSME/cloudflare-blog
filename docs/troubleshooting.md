@@ -235,9 +235,9 @@ neither.
 
 ## CMS "View on Live Site" link 404s
 
-The link points at `https://cloudflare-blog.aumnidigital-work.workers.dev/<slug>/` —
+The link points at `https://creativedigitalgrowth.pages.dev/<slug>/` —
 one `blog/` short of the real URL,
-`https://cloudflare-blog.aumnidigital-work.workers.dev/blog/<slug>/`.
+`https://creativedigitalgrowth.pages.dev/blog/<slug>/`.
 
 **Cause.** Sveltia keeps only the **origin** of `site_url` when building preview links.
 From the bundle:
@@ -307,7 +307,7 @@ To settle it definitively, compare a clean build against the live sitemap:
 ```bash
 rm -rf dist .astro && npm run build
 find dist -name index.html | sed 's#^dist##; s#/index.html#/#' | sort > /tmp/local.txt
-curl -s https://cloudflare-blog.aumnidigital-work.workers.dev/sitemap-0.xml   | grep -oE '<loc>[^<]*</loc>' | sed -E 's#</?loc>##g; s#https://cloudflare-blog.aumnidigital-work.workers.dev##'   | sort > /tmp/live.txt
+curl -s https://creativedigitalgrowth.pages.dev/sitemap-0.xml   | grep -oE '<loc>[^<]*</loc>' | sed -E 's#</?loc>##g; s#https://creativedigitalgrowth.pages.dev##'   | sort > /tmp/live.txt
 diff /tmp/local.txt /tmp/live.txt
 ```
 

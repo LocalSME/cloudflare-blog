@@ -1,9 +1,7 @@
 # Deployment
 
-**Live URL:** <https://cloudflare-blog.aumnidigital-work.workers.dev> — a Workers-platform
-account-subdomain URL, not the classic `<project>.pages.dev` pattern. This is what
-Cloudflare's newer unified Workers+Pages system assigns when a static site is connected
-via Git integration rather than created with the Pages CLI.
+**Live URL:** <https://creativedigitalgrowth.pages.dev> — a classic Cloudflare Pages
+project, created via Cloudflare's dashboard Git integration connected to this repo.
 **GitHub repo:** `CreativeDigitalGrowth/cloudflare-blog` — public, pushed, what the CMS
 commits to and what Cloudflare's Git integration watches.
 **Cloudflare project:** connected directly to that repo from the Cloudflare dashboard
@@ -69,7 +67,7 @@ visitors get rather than what the local build produced. This should actually be 
 real now, since the site is live:
 
 ```bash
-B=https://cloudflare-blog.aumnidigital-work.workers.dev
+B=https://creativedigitalgrowth.pages.dev
 for p in "" "blog/" "about/" "contact/" "search/" "admin/" "rss.xml" "sitemap-index.xml" "pagefind/pagefind-ui.js"; do
   echo "$(curl -s -o /dev/null -w '%{http_code}' -L "$B/$p")  /$p"
 done
@@ -82,7 +80,7 @@ All should return `200`. Then confirm nothing leaked:
 curl -s -o /dev/null -w '%{http_code}\n' -L "$B/blog/<draft-slug>/"   # expect 404
 
 # no root-absolute internal references
-curl -s -L "$B/" | grep -ohE 'https?://[^"]+' | grep -v 'cloudflare-blog.aumnidigital-work.workers.dev' | sort -u
+curl -s -L "$B/" | grep -ohE 'https?://[^"]+' | grep -v 'creativedigitalgrowth.pages.dev' | sort -u
 ```
 
 ## Rollback

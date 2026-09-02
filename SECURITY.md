@@ -125,7 +125,7 @@ pinned alternative if you would rather trade one risk for the other.
 ## Reporting a vulnerability
 
 If you find a security problem, please **do not open a public issue**. Email the address
-on the [contact page](https://cloudflare-blog.aumnidigital-work.workers.dev/contact/)
+on the [contact page](https://creativedigitalgrowth.pages.dev/contact/)
 with enough detail to reproduce it, and allow a reasonable window before disclosure.
 
 This is a personal blog maintained by one person, not a funded project — there is no

@@ -63,7 +63,7 @@ IDs, the contact endpoint and social links.
 dynamic routes ahead of rest parameters, and in a static build every path is enumerated
 up front, so the two cannot silently collide.
 
-Post URLs read `https://cloudflare-blog.aumnidigital-work.workers.dev/blog/<slug>/` —
+Post URLs read `https://creativedigitalgrowth.pages.dev/blog/<slug>/` —
 the site root plus the collection's route. Cloudflare Pages projects don't have GitHub's
 user-site-vs-project-site split at all, so there's no `/blog/blog/<slug>/`-style
 doubling risk to design around here — this project is root-served the same way the
@@ -129,7 +129,7 @@ To re-check after any change, build and confirm this prints nothing:
 
 ```bash
 npm run build
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'cloudflare-blog.aumnidigital-work.workers.dev' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'creativedigitalgrowth.pages.dev' | sort -u
 ```
 
 That's the full audit — every internal link, `srcset` entry and in-page anchor resolved

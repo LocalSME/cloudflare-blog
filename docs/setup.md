@@ -34,9 +34,8 @@ the Cloudflare dashboard, on this connected project's **Settings** page — not 
 file in this repo. See [deployment.md](deployment.md#whats-configurable-and-where) for
 the current values.
 
-The live URL is <https://cloudflare-blog.aumnidigital-work.workers.dev> — a
-Workers-platform account-subdomain URL rather than the classic `<project>.pages.dev`
-pattern, because that's what this newer Git-integration flow assigns. A custom domain
+The live URL is <https://creativedigitalgrowth.pages.dev> — the standard
+`<project>.pages.dev` domain Cloudflare assigns to a Pages project. A custom domain
 can be attached later from the same dashboard project; see
 [§7 below](#7-optional-custom-domain).
 
@@ -86,7 +85,7 @@ strictly tighter. Prefer fine-grained when the owner account is available to you
 
 Whichever you use, commits are authored by the account that issued the token.
 
-Then open <https://cloudflare-blog.aumnidigital-work.workers.dev/admin/>, choose
+Then open <https://creativedigitalgrowth.pages.dev/admin/>, choose
 **"Sign In Using Access Token"** and paste it.
 
 > There is no "Sign In with GitHub" button on the login screen. It starts an OAuth flow

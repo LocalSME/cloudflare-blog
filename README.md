@@ -4,7 +4,7 @@ A static blog for a single author. Astro + TypeScript, Markdown content collecti
 Sveltia CMS at `/admin`, Pagefind search, Giscus comments, deployed to **Cloudflare** by
 its dashboard's own Git integration.
 
-**Live URL:** <https://cloudflare-blog.aumnidigital-work.workers.dev/> — see
+**Live URL:** <https://creativedigitalgrowth.pages.dev/> — see
 [Status](#status) below for what's still outstanding.
 
 No server, no database, no tracking scripts, no cookie banner, no CSS framework. Three
@@ -90,7 +90,7 @@ author, `absFromBuiltPath()` for paths Astro produced, `absUrl()` for absolute U
 To verify after any change, build and confirm every absolute URL points at this site:
 
 ```bash
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html --include=*.xml   | grep -v 'cloudflare-blog.aumnidigital-work.workers.dev' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html --include=*.xml   | grep -v 'creativedigitalgrowth.pages.dev' | sort -u
 ```
 
 ## Status
