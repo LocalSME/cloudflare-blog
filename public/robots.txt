@@ -1,11 +1,11 @@
-# Served at https://cloudflare-blog.aumnidigital-work.workers.dev/robots.txt
+# Served at https://creativedigitalgrowth.pages.dev/robots.txt
 #
-# This Cloudflare project is served from its own domain root, so the file sits
-# where crawlers expect it. (Under a sub-path deployment it would need to move
-# accordingly, or it is ignored.)
+# This Cloudflare Pages project is served from its own domain root, so the file
+# sits where crawlers expect it. (Under a sub-path deployment it would need to
+# move accordingly, or it is ignored.)
 
 User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://cloudflare-blog.aumnidigital-work.workers.dev/sitemap-index.xml
+Sitemap: https://creativedigitalgrowth.pages.dev/sitemap-index.xml

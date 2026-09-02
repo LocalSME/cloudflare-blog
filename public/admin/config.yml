@@ -31,8 +31,8 @@ local_backend: true
 # Only the ORIGIN of site_url is used for preview links: Sveltia computes
 # `_baseURL = new URL(site_url).origin`. On this root-served site the origin IS the site
 # root, so preview_path below is simply the route.
-site_url: https://cloudflare-blog.aumnidigital-work.workers.dev/
-display_url: https://cloudflare-blog.aumnidigital-work.workers.dev/
+site_url: https://creativedigitalgrowth.pages.dev/
+display_url: https://creativedigitalgrowth.pages.dev/
 
 # Fallback media location so the media library has somewhere to browse. The blog
 # collection below overrides both values; nothing in this site relies on these.
@@ -55,7 +55,7 @@ collections:
     sortable_fields: [date, title, category]
     # Path from the SITE ORIGIN. This is a root-served site, so the route is all that
     # is needed:
-    #   https://cloudflare-blog.aumnidigital-work.workers.dev + / + blog/<slug>/
+    #   https://creativedigitalgrowth.pages.dev + / + blog/<slug>/
     # The trailing slash matches astro.config.mjs `trailingSlash: 'always'`.
     preview_path: blog/{{slug}}/
     preview_path_date_field: date
