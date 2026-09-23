@@ -161,7 +161,7 @@ Two consequences worth knowing:
 Uploading is still the more robust option. A URL is a convenience, not the default.
 
 **Do not put images in `public/`.** Anything there is copied verbatim and never
-optimised. The only images that belong in `public/` are `favicon.svg` and
+optimised. The only images that belong in `public/` are `logo.png` and
 `social-card.png`, which must exist at fixed URLs.
 
 Always write real alt text. Decorative images take `alt=""`.

@@ -37,7 +37,7 @@ src/
 └── styles/global.css        Design tokens + all styling
 public/
 ├── admin/                   Sveltia CMS (index.html + config.yml)
-├── favicon.svg              Theme-aware
+├── logo.png                 Header mark and favicon — shared across the LocalSME siblings
 ├── robots.txt
 └── social-card.png          Default Open Graph image, 1200×630
 ```
