@@ -1,6 +1,6 @@
 # Code of conduct
 
-Comments on this blog are [GitHub Discussions](https://github.com/CreativeDigitalGrowth/cloudflare-blog/discussions).
+Comments on this blog are [GitHub Discussions](https://github.com/LocalSME/cloudflare-blog/discussions).
 They are public, attached to your GitHub account, and moderated by the blog's author.
 
 ## The short version
@@ -41,7 +41,7 @@ repository.
 ## Reporting
 
 For something that needs attention, email the address on the
-[contact page](https://creativedigitalgrowth.pages.dev/contact/) rather
+[contact page](https://localsme.supernovasearch-localseo.workers.dev/contact/) rather
 than replying in the thread. Serious abuse can also be reported directly to GitHub at
 <https://github.com/contact/report-abuse>.
 

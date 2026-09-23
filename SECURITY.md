@@ -50,7 +50,9 @@ from the CMS clears it. Revoking it on GitHub invalidates it everywhere.
 ## The Cloudflare side
 
 There is no deploy token in this project — no `CLOUDFLARE_API_TOKEN`, no GitHub Actions
-secret, no Wrangler CLI anywhere in the pipeline. Deploys happen because Cloudflare's
+secret stored here. Wrangler runs, but only inside Cloudflare's own build environment on
+its own build token (never a secret in this repo or on this machine). Deploys happen
+because Cloudflare's
 dashboard is connected directly to this GitHub repository through its own **GitHub App
 installation**, granted read access when that connection was made in the dashboard
 (**Workers & Pages → the connected project**). That installation is what lets Cloudflare
@@ -59,7 +61,7 @@ see pushes to `main` and pull the code to build.
 That gives two independent things to think about, separate from the CMS token above:
 
 - **The GitHub App installation itself.** Anyone who can manage installed GitHub Apps on
-  the `CreativeDigitalGrowth` account can revoke or reconfigure what repositories
+  the `LocalSME` account can revoke or reconfigure what repositories
   Cloudflare's integration can see. That is a GitHub-side permission, not a Cloudflare
   one.
 - **Cloudflare account/dashboard access.** Separately, anyone who can log into the
@@ -125,7 +127,7 @@ pinned alternative if you would rather trade one risk for the other.
 ## Reporting a vulnerability
 
 If you find a security problem, please **do not open a public issue**. Email the address
-on the [contact page](https://creativedigitalgrowth.pages.dev/contact/)
+on the [contact page](https://localsme.supernovasearch-localseo.workers.dev/contact/)
 with enough detail to reproduce it, and allow a reasonable window before disclosure.
 
 This is a personal blog maintained by one person, not a funded project — there is no

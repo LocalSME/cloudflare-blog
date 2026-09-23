@@ -1,11 +1,11 @@
 # Working in this repository
 
-A solo-author static blog: Astro 7 + TypeScript, deployed to **Cloudflare** by its
-dashboard's own Git integration, served from the domain root. Independent
-from the sibling GitHub Pages blog (`CreativeDigitalGrowth/CreativeDigitalGrowth.github.io`)
-and the sibling GitLab Pages blog (`creativedigitalgrowth.gitlab.io`) — not a mirror, no
-shared content, no shared git history. Full detail in
-[`docs/architecture.md`](docs/architecture.md).
+A solo-author static blog: Astro 7 + TypeScript, deployed as a **Cloudflare Worker**
+(Workers Static Assets, not a classic Pages project) by Cloudflare's dashboard Git
+integration, served from the domain root. Independent from the sibling GitHub Pages
+blog (`LocalSME/LocalSME.github.io`) and the sibling GitLab Pages blog
+(`localsme.gitlab.io`) — not a mirror, no shared content, no shared git history. Full
+detail in [`docs/architecture.md`](docs/architecture.md).
 
 ## Development
 
@@ -82,7 +82,7 @@ in the Cloudflare dashboard (build log and status) before suspecting anything el
 ```bash
 npm run check    # expect 0 errors
 npm run build
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'creativedigitalgrowth.pages.dev' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'localsme.supernovasearch-localseo.workers.dev' | sort -u
 ```
 
 The grep must print only genuinely external URLs (giscus, google maps, unpkg). If the
@@ -92,26 +92,37 @@ change is visible in a browser, verify with `npm run preview` rather than `npm r
 ## Deployment
 
 Push to `main` → Cloudflare's dashboard Git integration (Workers & Pages → this project,
-connected directly to `CreativeDigitalGrowth/cloudflare-blog`) picks it up via its own
+connected directly to `LocalSME/cloudflare-blog`) picks it up via its own
 GitHub App installation and builds and deploys it itself — `npm run build` (which
-triggers the `postbuild` Pagefind index), then publishing the output directory. Saving in
-the CMS is a push, so publishing and deploying are the same action. There is no GitHub
-Actions workflow and no Wrangler CLI involved anywhere in this pipeline. See
-[`docs/deployment.md`](docs/deployment.md).
+triggers the `postbuild` Pagefind index), then `npx wrangler deploy` publishes `dist/`
+as this Worker's static assets, per [`wrangler.jsonc`](wrangler.jsonc). Saving in the
+CMS is a push, so publishing and deploying are the same action. There is no GitHub
+Actions workflow in this pipeline, but Wrangler **is** involved (unlike the classic-Pages
+sibling `cloudflare-blog`) — see [`docs/deployment.md`](docs/deployment.md).
 
 No repository secrets exist or are needed — build authorization is entirely between
-Cloudflare and its own GitHub App installation, not a token stored in this repo.
+Cloudflare and its own GitHub App installation, not a token stored in this repo. That
+token is scoped for Workers deploys specifically; if this project were ever reconnected
+as a classic Pages project instead, `npx wrangler pages deploy` would fail
+authentication against the Pages API even with a correct `--project-name` — Workers and
+Pages tokens are not interchangeable. Learned the hard way setting this project up.
 
-**Build settings — build command, output directory, Node version, environment
-variables — live in the Cloudflare dashboard project settings, not in any file in this
-repository.** There is no `wrangler.toml` and none is needed. This is the one real
-"where do I configure X" gotcha coming from the sibling GitHub Pages blog, whose
-equivalent settings live in a workflow file you can read in this repo — here, look in
-the dashboard instead. See [`docs/setup.md`](docs/setup.md).
+**Build command, output directory and Node version live in the Cloudflare dashboard
+project settings, not in any file in this repository** (except `wrangler.jsonc`, which
+declares the Worker's name and its static-assets directory — that file *is* required
+here, unlike the classic-Pages sibling). This is the one real "where do I configure X"
+gotcha coming from the sibling GitHub Pages blog, whose equivalent settings live in a
+workflow file you can read in this repo — here, look in the dashboard instead. See
+[`docs/setup.md`](docs/setup.md).
 
-Local git authenticates as `mohiseen-aumni`, the same account used for the sibling
+**A successful deploy alone does not make the site reachable.** This Worker's
+`workers.dev` subdomain toggle (Domains tab → Worker URL → Production) must be on, or
+there is no public URL at all even with a green build. Check that first if "the deploy
+succeeded but there's no URL" ever comes up again.
+
+Local git authenticates as `LocalSME`, the same account used for the sibling
 GitHub Pages blog. The repository exists on GitHub, is public, and is live at
-`CreativeDigitalGrowth/cloudflare-blog`.
+`LocalSME/cloudflare-blog`.
 
 ## Documentation
 

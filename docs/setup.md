@@ -3,7 +3,7 @@
 Everything on this page is done once. Sections degrade gracefully — missing pieces mean
 a notice or a fallback, not a broken build.
 
-The GitHub repository (`CreativeDigitalGrowth/cloudflare-blog`) is created, public and
+The GitHub repository (`LocalSME/cloudflare-blog`) is created, public and
 pushed. Cloudflare's dashboard is connected to it and deploying automatically.
 
 | Step | Status |
@@ -23,21 +23,26 @@ Done. This is a manual, one-time action taken directly in the Cloudflare dashboa
 something a future reader needs to redo — recorded here so it's clear what exists and
 where to find it.
 
-Cloudflare's dashboard is connected directly to `CreativeDigitalGrowth/cloudflare-blog`:
-**Workers & Pages → Create → Connect to Git → `CreativeDigitalGrowth/cloudflare-blog`**.
-That connection installs a Cloudflare-owned GitHub App with read access to this repo, and
-from then on Cloudflare watches `main` itself and rebuilds on every push — no GitHub
-Actions workflow, no Wrangler CLI, no repository secrets involved anywhere.
+Cloudflare's dashboard is connected directly to `LocalSME/cloudflare-blog`:
+**Workers & Pages → Create → Connect to Git → `LocalSME/cloudflare-blog`**. That flow
+created this as a **Worker**, not a classic Pages project — the connection installs a
+Cloudflare-owned GitHub App with read access to this repo, and from then on Cloudflare
+watches `main` itself and rebuilds on every push — no GitHub Actions workflow, no
+repository secrets involved anywhere. Wrangler *is* involved, but only inside
+Cloudflare's own build environment (`npx wrangler deploy`, using
+[`wrangler.jsonc`](../wrangler.jsonc)), never locally.
 
-Build command, output directory, Node version and environment variables are all set in
-the Cloudflare dashboard, on this connected project's **Settings** page — not in any
-file in this repo. See [deployment.md](deployment.md#whats-configurable-and-where) for
-the current values.
+Build command, deploy command, root directory and Node version are all set in the
+Cloudflare dashboard, on this connected project's **Settings** page — not in any file in
+this repo except `wrangler.jsonc`. See
+[deployment.md](deployment.md#whats-configurable-and-where) for the current values.
 
-The live URL is <https://creativedigitalgrowth.pages.dev> — the standard
-`<project>.pages.dev` domain Cloudflare assigns to a Pages project. A custom domain
-can be attached later from the same dashboard project; see
-[§7 below](#7-optional-custom-domain).
+The live URL is <https://localsme.supernovasearch-localseo.workers.dev> — the standard
+`<worker-name>.<account-subdomain>.workers.dev` domain Cloudflare assigns to a Worker.
+That domain does not appear automatically even after a successful deploy: the
+`workers.dev` subdomain toggle (**Domains tab → Worker URL → Production**) has to be
+switched on once. A custom domain can be attached later from the same dashboard
+project; see [§7 below](#7-optional-custom-domain).
 
 ## 2. Access token for the CMS
 
@@ -52,7 +57,7 @@ Two kinds of token work, and which one you can use depends on **who owns the rep
 
 | Field | Value |
 | --- | --- |
-| Resource owner | `CreativeDigitalGrowth` |
+| Resource owner | `LocalSME` |
 | Repository access | **Only select repositories → `cloudflare-blog`** |
 | Repository permissions → **Contents** | **Read and write** |
 | Repository permissions → Metadata | Read-only (added automatically) |
@@ -85,7 +90,7 @@ strictly tighter. Prefer fine-grained when the owner account is available to you
 
 Whichever you use, commits are authored by the account that issued the token.
 
-Then open <https://creativedigitalgrowth.pages.dev/admin/>, choose
+Then open <https://localsme.supernovasearch-localseo.workers.dev/admin/>, choose
 **"Sign In Using Access Token"** and paste it.
 
 > There is no "Sign In with GitHub" button on the login screen. It starts an OAuth flow
@@ -107,14 +112,14 @@ configured, post pages show a one-line notice instead of the widget — nothing 
 2. Open the **Discussions** tab and make sure a category exists. The default expected by
    `src/consts.ts` is **Announcements**; any category works as long as the names match.
 3. Install the app at <https://github.com/apps/giscus> and grant it access to
-   `CreativeDigitalGrowth/cloudflare-blog` **only**.
-4. Go to <https://giscus.app>, enter `CreativeDigitalGrowth/cloudflare-blog`, pick the
+   `LocalSME/cloudflare-blog` **only**.
+4. Go to <https://giscus.app>, enter `LocalSME/cloudflare-blog`, pick the
    category, and choose *Discussion title contains page pathname* for the mapping.
 5. Copy the generated `data-repo-id` and `data-category-id` into `src/consts.ts`:
 
 ```ts
 export const GISCUS = {
-  repo: 'CreativeDigitalGrowth/cloudflare-blog',
+  repo: 'LocalSME/cloudflare-blog',
   repoId: 'R_kg...',        // ← paste
   category: 'Announcements',
   categoryId: 'DIC_kw...',  // ← paste

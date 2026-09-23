@@ -1,7 +1,7 @@
 /**
  * Single place to edit the blog's identity. Nothing else hardcodes these values.
  */
-export const SITE_TITLE = 'Creative Digital Growth';
+export const SITE_TITLE = 'LocalSME';
 export const SITE_DESCRIPTION =
   'A small, fast, hand-built blog about the things worth writing down.';
 
@@ -43,7 +43,7 @@ export const TOC_MIN_HEADINGS = 3;
  * section renders a short notice instead of the widget.
  */
 export const GISCUS = {
-  repo: 'CreativeDigitalGrowth/cloudflare-blog',
+  repo: 'LocalSME/cloudflare-blog',
   repoId: '',
   category: 'Announcements',
   categoryId: '',
@@ -61,5 +61,5 @@ export const CONTACT_FORM_ENDPOINT = '';
 
 /** Optional social links shown in the footer. Remove any you do not use. */
 export const SOCIAL_LINKS = [
-  { label: 'GitHub', href: 'https://github.com/CreativeDigitalGrowth' },
+  { label: 'GitHub', href: 'https://github.com/LocalSME' },
 ] as const;

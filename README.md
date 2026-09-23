@@ -4,16 +4,17 @@ A static blog for a single author. Astro + TypeScript, Markdown content collecti
 Sveltia CMS at `/admin`, Pagefind search, Giscus comments, deployed to **Cloudflare** by
 its dashboard's own Git integration.
 
-**Live URL:** <https://creativedigitalgrowth.pages.dev/> — see
+**Live URL:** <https://localsme.supernovasearch-localseo.workers.dev/> — see
 [Status](#status) below for what's still outstanding.
 
 No server, no database, no tracking scripts, no cookie banner, no CSS framework. Three
 runtime dependencies. The only client-side JavaScript is a theme toggle, a copy-link
 button, the search page and the comment widget.
 
-Sibling projects: [`blog/`](../blog) (GitHub Pages) and
-[`Gitlab-blog/`](../Gitlab-blog) (GitLab Pages) — same feature set, independent content
-and git history, deliberately different visual design from each other.
+Sibling projects: [`localsme-blog/`](../localsme-blog) (GitHub Pages) and
+[`localsme-gitlab-blog/`](../localsme-gitlab-blog) (GitLab Pages) — same feature set,
+independent content and git history, deliberately different visual design from each
+other.
 
 ## Documentation
 
@@ -81,7 +82,7 @@ no page, no feed entry, no archive listing, no search hit. Full reference in
 
 ## Base-path safety
 
-This is a **root-served site** — a Cloudflare Pages project has no sub-path of its own
+This is a **root-served site** — a Cloudflare Worker has no sub-path of its own
 — so `base` is `/` and a root-absolute `/foo/` link happens to work. That is a
 coincidence of the current hosting, not a licence to hardcode paths: every internal link
 still goes through [`src/lib/url.ts`](src/lib/url.ts) — `withBase()` for paths you
@@ -90,7 +91,7 @@ author, `absFromBuiltPath()` for paths Astro produced, `absUrl()` for absolute U
 To verify after any change, build and confirm every absolute URL points at this site:
 
 ```bash
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html --include=*.xml   | grep -v 'creativedigitalgrowth.pages.dev' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html --include=*.xml   | grep -v 'localsme.supernovasearch-localseo.workers.dev' | sort -u
 ```
 
 ## Status
@@ -98,7 +99,7 @@ grep -rhoE 'https?://[^"< ]+' dist --include=*.html --include=*.xml   | grep -v 
 This project was scaffolded from the sibling GitHub Pages blog. The repo/deploy pipeline
 is done:
 
-- GitHub repository created and pushed — public, `CreativeDigitalGrowth/cloudflare-blog`
+- GitHub repository created and pushed — public, `LocalSME/cloudflare-blog`
 - Cloudflare's dashboard connected directly to that repo via its own Git integration
 - The site builds and deploys automatically on every push to `main`
 - The site renders at the live URL above

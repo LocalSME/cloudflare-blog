@@ -1,6 +1,6 @@
-# Served at https://creativedigitalgrowth.pages.dev/robots.txt
+# Served at https://localsme.supernovasearch-localseo.workers.dev/robots.txt
 #
-# This Cloudflare Pages project is served from its own domain root, so the file
+# This Cloudflare Worker is served from its own domain root, so the file
 # sits where crawlers expect it. (Under a sub-path deployment it would need to
 # move accordingly, or it is ignored.)
 
@@ -8,4 +8,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://creativedigitalgrowth.pages.dev/sitemap-index.xml
+Sitemap: https://localsme.supernovasearch-localseo.workers.dev/sitemap-index.xml
