@@ -4,7 +4,7 @@ A static blog for a single author. Astro + TypeScript, Markdown content collecti
 Sveltia CMS at `/admin`, Pagefind search, Giscus comments, deployed to **Cloudflare** by
 its dashboard's own Git integration.
 
-**Live URL:** <https://localsme.supernovasearch-localseo.workers.dev/> — see
+**Live URL:** <https://localsme.pages.dev/> — see
 [Status](#status) below for what's still outstanding.
 
 No server, no database, no tracking scripts, no cookie banner, no CSS framework. Three
@@ -82,7 +82,7 @@ no page, no feed entry, no archive listing, no search hit. Full reference in
 
 ## Base-path safety
 
-This is a **root-served site** — a Cloudflare Worker has no sub-path of its own
+This is a **root-served site** — a Cloudflare Pages project has no sub-path of its own
 — so `base` is `/` and a root-absolute `/foo/` link happens to work. That is a
 coincidence of the current hosting, not a licence to hardcode paths: every internal link
 still goes through [`src/lib/url.ts`](src/lib/url.ts) — `withBase()` for paths you
@@ -91,7 +91,7 @@ author, `absFromBuiltPath()` for paths Astro produced, `absUrl()` for absolute U
 To verify after any change, build and confirm every absolute URL points at this site:
 
 ```bash
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html --include=*.xml   | grep -v 'localsme.supernovasearch-localseo.workers.dev' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html --include=*.xml   | grep -v 'localsme.pages.dev' | sort -u
 ```
 
 ## Status

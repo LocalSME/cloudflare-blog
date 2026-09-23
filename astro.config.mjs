@@ -2,14 +2,17 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// Deployed via Cloudflare's dashboard Git integration as a Worker (Workers Static
-// Assets, see wrangler.jsonc — not a classic Pages project), served from its
-// *.workers.dev domain root — so there is no base path. `base` is left at its default
-// of '/'. src/lib/url.ts still mediates every internal link, so the site can move under
-// a sub-path (or onto a custom domain, see docs/setup.md) by changing `site`/`base`
-// here and nothing else.
+// Deployed via Cloudflare's dashboard Git integration as a classic Pages project,
+// served from its *.pages.dev domain root — so there is no base path. `base` is left
+// at its default of '/'. src/lib/url.ts still mediates every internal link, so the site
+// can move under a sub-path (or onto a custom domain, see docs/setup.md) by changing
+// `site`/`base` here and nothing else.
+//
+// An earlier connection attempt landed this project as a Cloudflare Worker instead —
+// see docs/setup.md#1-cloudflare-git-integration for why, and why it was deleted in
+// favour of this classic Pages project.
 export default defineConfig({
-  site: 'https://localsme.supernovasearch-localseo.workers.dev',
+  site: 'https://localsme.pages.dev',
   trailingSlash: 'always',
   integrations: [
     sitemap({

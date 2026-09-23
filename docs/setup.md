@@ -24,25 +24,32 @@ something a future reader needs to redo — recorded here so it's clear what exi
 where to find it.
 
 Cloudflare's dashboard is connected directly to `LocalSME/cloudflare-blog`:
-**Workers & Pages → Create → Connect to Git → `LocalSME/cloudflare-blog`**. That flow
-created this as a **Worker**, not a classic Pages project — the connection installs a
-Cloudflare-owned GitHub App with read access to this repo, and from then on Cloudflare
-watches `main` itself and rebuilds on every push — no GitHub Actions workflow, no
-repository secrets involved anywhere. Wrangler *is* involved, but only inside
-Cloudflare's own build environment (`npx wrangler deploy`, using
-[`wrangler.jsonc`](../wrangler.jsonc)), never locally.
+**Workers & Pages → Create → Pages → Connect to Git → `LocalSME/cloudflare-blog`**. That
+installs a Cloudflare-owned GitHub App with read access to this repo, and from then on
+Cloudflare watches `main` itself and rebuilds on every push — no GitHub Actions
+workflow, no Wrangler CLI, no repository secrets involved anywhere.
 
-Build command, deploy command, root directory and Node version are all set in the
-Cloudflare dashboard, on this connected project's **Settings** page — not in any file in
-this repo except `wrangler.jsonc`. See
-[deployment.md](deployment.md#whats-configurable-and-where) for the current values.
+Build command, output directory and Node version are all set in the Cloudflare
+dashboard, on this connected project's **Settings** page — not in any file in this repo.
+See [deployment.md](deployment.md#whats-configurable-and-where) for the current values.
 
-The live URL is <https://localsme.supernovasearch-localseo.workers.dev> — the standard
-`<worker-name>.<account-subdomain>.workers.dev` domain Cloudflare assigns to a Worker.
-That domain does not appear automatically even after a successful deploy: the
-`workers.dev` subdomain toggle (**Domains tab → Worker URL → Production**) has to be
-switched on once. A custom domain can be attached later from the same dashboard
-project; see [§7 below](#7-optional-custom-domain).
+The live URL is <https://localsme.pages.dev> — the standard `<project>.pages.dev` domain
+Cloudflare assigns to a Pages project. A custom domain can be attached later from the
+same dashboard project; see [§7 below](#7-optional-custom-domain).
+
+**Not the first attempt at this connection.** The dashboard's unified "Connect to Git"
+flow can create either a classic Pages project or a Worker, and an earlier attempt at
+connecting this same repo landed as a **Worker** instead — its auto-generated build
+token is scoped for Workers deploys only, so `npx wrangler pages deploy` failed
+authentication against the Pages API no matter what project name was passed, even
+though the build itself succeeded. That Worker briefly ran at
+`localsme.supernovasearch-localseo.workers.dev` on a different Cloudflare account
+(`Supernovasearch.localseo@gmail.com`), using a `wrangler.jsonc` this repo no longer
+carries. It — and its Cloudflare project settings — were deleted once this classic Pages
+project replaced it as the canonical deployment, so that URL is no longer live. If a
+future Cloudflare Git-connected project ever "builds successfully but has no live URL,"
+check which kind of project it is before assuming a build-config typo — this is exactly
+what happened here.
 
 ## 2. Access token for the CMS
 
@@ -90,7 +97,7 @@ strictly tighter. Prefer fine-grained when the owner account is available to you
 
 Whichever you use, commits are authored by the account that issued the token.
 
-Then open <https://localsme.supernovasearch-localseo.workers.dev/admin/>, choose
+Then open <https://localsme.pages.dev/admin/>, choose
 **"Sign In Using Access Token"** and paste it.
 
 > There is no "Sign In with GitHub" button on the login screen. It starts an OAuth flow

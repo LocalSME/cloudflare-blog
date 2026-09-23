@@ -15,7 +15,7 @@ How the site is put together, and why the awkward parts are the way they are.
 | Feed | `@astrojs/rss` | 4.x |
 | Sitemap | `@astrojs/sitemap` | 3.x |
 | Styling | Hand-written CSS with custom properties | — |
-| Hosting | Cloudflare (Workers/Pages), deployed by Cloudflare's dashboard Git integration | — |
+| Hosting | Cloudflare Pages, deployed by Cloudflare's dashboard Git integration | — |
 
 Three runtime dependencies, three dev dependencies. No CSS framework — the whole
 stylesheet is one file of about 800 lines and nothing is shipped that isn't used.
@@ -63,8 +63,8 @@ IDs, the contact endpoint and social links.
 dynamic routes ahead of rest parameters, and in a static build every path is enumerated
 up front, so the two cannot silently collide.
 
-Post URLs read `https://localsme.supernovasearch-localseo.workers.dev/blog/<slug>/` —
-the site root plus the collection's route. A Cloudflare Worker doesn't have GitHub's
+Post URLs read `https://localsme.pages.dev/blog/<slug>/` — the site root plus the
+collection's route. A Cloudflare Pages project doesn't have GitHub's
 user-site-vs-project-site split at all, so there's no `/blog/blog/<slug>/`-style
 doubling risk to design around here — this project is root-served the same way the
 sibling GitHub Pages user site is, just for a different reason.
@@ -95,7 +95,7 @@ covers posts only.
 This is the part that breaks sites, so it gets an explicit design rather than a
 convention.
 
-This is a **Cloudflare Worker, root-served**, so `base` is `/`. A Cloudflare Worker
+This is a **Cloudflare Pages project, root-served**, so `base` is `/`. Cloudflare Pages
 has no GitHub-style user-site-vs-project-site distinction at all — there's no dashboard
 setting or repo-naming convention that changes this. A root-absolute `/foo/` link
 therefore happens to work — but that is a property of the current hosting, not of the
@@ -129,7 +129,7 @@ To re-check after any change, build and confirm this prints nothing:
 
 ```bash
 npm run build
-grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'localsme.supernovasearch-localseo.workers.dev' | sort -u
+grep -rhoE 'https?://[^"< ]+' dist --include=*.html | grep -v 'localsme.pages.dev' | sort -u
 ```
 
 That's the full audit — every internal link, `srcset` entry and in-page anchor resolved
@@ -257,7 +257,7 @@ Graph and Twitter card tags, and — on post pages only — JSON-LD `BlogPosting
 pages past the first are `noindex, follow`.
 
 `robots.txt` sits at the domain root and is therefore **authoritative** — this is a
-root-served Cloudflare Worker, so crawlers read it directly. (GitHub Pages has a
+root-served Cloudflare Pages project, so crawlers read it directly. (GitHub Pages has a
 project-site mode where `robots.txt` would live under a repo sub-path and crawlers
 would ignore it; this hosting has no such mode to worry about.)
 

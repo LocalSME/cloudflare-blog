@@ -1,24 +1,20 @@
 # Deployment
 
-**Live URL:** <https://localsme.supernovasearch-localseo.workers.dev> — a Cloudflare
-**Worker** (Workers Static Assets), created via Cloudflare's dashboard Git integration
-connected to this repo. Not a classic Pages project — see the note below.
+**Live URL:** <https://localsme.pages.dev> — a classic Cloudflare Pages project,
+created via Cloudflare's dashboard Git integration connected to this repo.
 **GitHub repo:** `LocalSME/cloudflare-blog` — public, pushed, what the CMS
 commits to and what Cloudflare's Git integration watches.
 **Cloudflare project:** connected directly to that repo from the Cloudflare dashboard
 (**Workers & Pages**) — see [setup.md](setup.md#1-cloudflare-git-integration) for how
 that connection was made.
 
-**Worker, not Pages — and it matters.** Connecting a repo through the dashboard's
-unified "Connect to Git" flow can create either a classic Pages project or a Worker;
-this one landed as a Worker. Its auto-generated build token is scoped for Workers
-deploys only — `npx wrangler pages deploy` fails authentication against the Pages API
-on this token no matter what project name is passed, even though the build itself
-succeeds. The deploy command here is plain `npx wrangler deploy`, and
-[`wrangler.jsonc`](../wrangler.jsonc) declares this as a static-assets Worker
-(`assets.directory: "./dist"`, `name: "localsme"` matching the Worker). If you ever see
-"build succeeded but there's no live URL" on a Cloudflare Git-connected project, check
-which kind of project it is before assuming a build-config typo.
+**Not the first attempt.** Connecting a repo through the dashboard's unified "Connect to
+Git" flow can create either a classic Pages project or a Worker; an earlier attempt at
+connecting this repo landed as a Worker instead of Pages, at
+`localsme.supernovasearch-localseo.workers.dev` on a different Cloudflare account. That
+Worker (and its project settings) has been deleted — see
+[setup.md](setup.md#1-cloudflare-git-integration) for the full story and the "build
+succeeded but there's no live URL" gotcha it left behind.
 
 ## How it works
 
@@ -33,11 +29,9 @@ push to main (including a CMS save)
 ```
 
 Saving a post in the CMS **is** a push to `main`, so publishing and deploying are the
-same action. There is no GitHub Actions workflow in this pipeline — Cloudflare
-authenticates to GitHub through its own GitHub App installation, not a token stored in
-this repo, and there are no repository secrets involved at all. Wrangler *is* involved,
-but only as the tool Cloudflare's own build environment runs on its own build token
-(`npx wrangler deploy`) — nothing to install or authenticate locally.
+same action. There is no GitHub Actions workflow and no Wrangler CLI anywhere in this
+pipeline — Cloudflare authenticates to GitHub through its own GitHub App installation,
+not a token stored in this repo, and there are no repository secrets involved at all.
 
 ### Why the npm `postbuild` hook matters
 
@@ -52,21 +46,18 @@ There is no project-creation step and no repository secrets — the one-time set
 connecting the Cloudflare dashboard to this GitHub repo (**Workers & Pages → Create →
 Connect to Git**, done already; see [setup.md](setup.md#1-cloudflare-git-integration)).
 
-Most of what's configurable lives in the Cloudflare dashboard, not in any file in this
-repo — except the Worker's identity and static-assets directory, which
-[`wrangler.jsonc`](../wrangler.jsonc) declares:
+What *is* configurable lives entirely in the Cloudflare dashboard, not in any file in
+this repo — there is no `wrangler.toml`/`wrangler.jsonc` in this repository at all:
 
-**Project → Settings → Builds**, or the equivalent in the newer Workers & Pages
-settings UI:
+**Project → Settings → Build**, or the equivalent in the newer Workers & Pages settings
+UI:
 
 | Setting | Value here |
 | --- | --- |
 | Build command | `npm run build` |
-| Deploy command | `npx wrangler deploy` |
-| Root directory | `/` |
-| Node version | 22 (auto-detected; matches `engines.node` in `package.json`) |
-| Build variables | none required by this project today |
-| `workers.dev` subdomain (Domains tab) | must be **on**, or a green build still has no public URL |
+| Output directory | `dist` |
+| Node version | 22 (matches `engines.node` in `package.json`) |
+| Environment variables | none required by this project today |
 
 Anyone used to the sibling GitHub Pages blog's GitHub-Actions-based flow should look
 here, not in this repo, for anything that would otherwise be a workflow-file setting —
@@ -84,7 +75,7 @@ visitors get rather than what the local build produced. This should actually be 
 real now, since the site is live:
 
 ```bash
-B=https://localsme.supernovasearch-localseo.workers.dev
+B=https://localsme.pages.dev
 for p in "" "blog/" "about/" "contact/" "search/" "admin/" "rss.xml" "sitemap-index.xml" "pagefind/pagefind-ui.js"; do
   echo "$(curl -s -o /dev/null -w '%{http_code}' -L "$B/$p")  /$p"
 done
@@ -97,7 +88,7 @@ All should return `200`. Then confirm nothing leaked:
 curl -s -o /dev/null -w '%{http_code}\n' -L "$B/blog/<draft-slug>/"   # expect 404
 
 # no root-absolute internal references
-curl -s -L "$B/" | grep -ohE 'https?://[^"]+' | grep -v 'localsme.supernovasearch-localseo.workers.dev' | sort -u
+curl -s -L "$B/" | grep -ohE 'https?://[^"]+' | grep -v 'localsme.pages.dev' | sort -u
 ```
 
 ## Rollback

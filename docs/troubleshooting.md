@@ -235,9 +235,9 @@ neither.
 
 ## CMS "View on Live Site" link 404s
 
-The link points at `https://localsme.supernovasearch-localseo.workers.dev/<slug>/` —
+The link points at `https://localsme.pages.dev/<slug>/` —
 one `blog/` short of the real URL,
-`https://localsme.supernovasearch-localseo.workers.dev/blog/<slug>/`.
+`https://localsme.pages.dev/blog/<slug>/`.
 
 **Cause.** Sveltia keeps only the **origin** of `site_url` when building preview links.
 From the bundle:
@@ -259,7 +259,7 @@ preview_path: blog/{{slug}}/
 ```
 
 On a GitHub Pages *project* site the base has to be repeated — `blog/blog/{{slug}}/` —
-because the origin excludes it. This is a root-served Cloudflare Worker, so the
+because the origin excludes it. This is a root-served Cloudflare Pages project, so the
 origin is the site root and the route alone is correct.
 
 `site_url` and `display_url` still carry the full URL: only `site_url`'s origin is used
@@ -307,7 +307,7 @@ To settle it definitively, compare a clean build against the live sitemap:
 ```bash
 rm -rf dist .astro && npm run build
 find dist -name index.html | sed 's#^dist##; s#/index.html#/#' | sort > /tmp/local.txt
-curl -s https://localsme.supernovasearch-localseo.workers.dev/sitemap-0.xml   | grep -oE '<loc>[^<]*</loc>' | sed -E 's#</?loc>##g; s#https://localsme.supernovasearch-localseo.workers.dev##'   | sort > /tmp/live.txt
+curl -s https://localsme.pages.dev/sitemap-0.xml   | grep -oE '<loc>[^<]*</loc>' | sed -E 's#</?loc>##g; s#https://localsme.pages.dev##'   | sort > /tmp/live.txt
 diff /tmp/local.txt /tmp/live.txt
 ```
 

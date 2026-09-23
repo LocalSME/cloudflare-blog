@@ -50,8 +50,7 @@ from the CMS clears it. Revoking it on GitHub invalidates it everywhere.
 ## The Cloudflare side
 
 There is no deploy token in this project — no `CLOUDFLARE_API_TOKEN`, no GitHub Actions
-secret stored here. Wrangler runs, but only inside Cloudflare's own build environment on
-its own build token (never a secret in this repo or on this machine). Deploys happen
+secret stored here, and no Wrangler CLI anywhere in this pipeline. Deploys happen
 because Cloudflare's
 dashboard is connected directly to this GitHub repository through its own **GitHub App
 installation**, granted read access when that connection was made in the dashboard
@@ -127,7 +126,7 @@ pinned alternative if you would rather trade one risk for the other.
 ## Reporting a vulnerability
 
 If you find a security problem, please **do not open a public issue**. Email the address
-on the [contact page](https://localsme.supernovasearch-localseo.workers.dev/contact/)
+on the [contact page](https://localsme.pages.dev/contact/)
 with enough detail to reproduce it, and allow a reasonable window before disclosure.
 
 This is a personal blog maintained by one person, not a funded project — there is no
